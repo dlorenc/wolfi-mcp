@@ -35,7 +35,11 @@ go build -o mcp-server
 The server reads from standard input and writes to standard output following the MCP protocol.
 
 ```bash
+# Start the server with default settings (downloads the latest APKINDEX from Wolfi)
 ./mcp-server
+
+# Use a specific APKINDEX file
+./mcp-server -index /path/to/your/APKINDEX.tar.gz
 ```
 
 ### Available Tools
@@ -69,6 +73,17 @@ The server provides the following tools:
 The server uses an APKINDEX.tar.gz file which contains the package database information. 
 This file follows the Alpine Linux repository format and is parsed using the chainguard-dev/apko 
 Go module.
+
+By default, the server automatically downloads the latest APKINDEX.tar.gz from the Wolfi repository:
+- https://packages.wolfi.dev/os/aarch64/APKINDEX.tar.gz (on ARM64 systems)
+- https://packages.wolfi.dev/os/x86_64/APKINDEX.tar.gz (on x86_64 systems)
+
+The downloaded file is cached in a standard OS-specific location to avoid unnecessary downloads on restart:
+- Linux: `$XDG_CACHE_HOME/wolfi-mcp/APKINDEX.tar.gz` (defaults to `~/.cache/wolfi-mcp/APKINDEX.tar.gz`)
+- macOS: `~/Library/Caches/wolfi-mcp/APKINDEX.tar.gz`
+- Windows: `%LOCALAPPDATA%\wolfi-mcp\cache\APKINDEX.tar.gz`
+
+You can override this behavior and use a specific APKINDEX file by using the `-index` flag.
 
 ## Development
 
