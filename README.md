@@ -1,6 +1,6 @@
 # Wolfi MCP Package Database
 
-An MCP (Model Calling Protocol) server for querying and interacting with Alpine-based Linux distribution package databases.
+An MCP (Model Context Protocol) server for querying and interacting with Alpine-based Linux distribution package databases.
 
 ## Features
 
@@ -84,6 +84,127 @@ The downloaded file is cached in a standard OS-specific location to avoid unnece
 - Windows: `%LOCALAPPDATA%\wolfi-mcp\cache\APKINDEX.tar.gz`
 
 You can override this behavior and use a specific APKINDEX file by using the `-index` flag.
+
+## Using with Claude Code
+
+This MCP server is designed to work with Claude Code via the Model Context Protocol (MCP). Here's how to set it up:
+
+### Prerequisites
+
+- Go 1.24 or higher
+- Claude Code CLI
+- Git (to clone the repository)
+
+### Installation and Setup
+
+1. **Clone and build the server**:
+   ```bash
+   git clone https://github.com/dlorenc/wolfi-mcp.git
+   cd wolfi-mcp
+   go build -o mcp-server
+   ```
+
+2. **Register the MCP server with Claude Code**:
+   
+   Use the `claude mcp add` command to register the MCP server:
+   
+   ```bash
+   claude mcp add wolfi -- ./mcp-server
+   ```
+   
+   You can also specify a custom APKINDEX file:
+   
+   ```bash
+   claude mcp add wolfi -- ./mcp-server -index /path/to/your/APKINDEX.tar.gz
+   ```
+   
+   To make the server available in all projects:
+   
+   ```bash
+   claude mcp add wolfi -s user -- ./mcp-server
+   ```
+
+3. **Verify the server is registered**:
+   
+   ```bash
+   claude mcp list
+   ```
+
+### Using the Wolfi MCP Server Tools
+
+Once the server is registered, you can access its tools in Claude Code conversations with this format:
+
+```
+/tool mcp__wolfi__tool_name --parameter=value
+```
+
+For example:
+
+```
+/tool mcp__wolfi__search_packages --query=python
+/tool mcp__wolfi__package_info --package=python3
+/tool mcp__wolfi__package_dependencies --package=python3
+/tool mcp__wolfi__compare_versions --package=python3
+/tool mcp__wolfi__package_graph --package=python3 --query_type=depends_on
+```
+
+### Example Session
+
+Here's an example of how Claude Code might use these tools in a conversation:
+
+```
+User: What packages are available for Python in Wolfi?
+
+Claude: I'll search the Wolfi package database for Python packages.
+
+/tool mcp__wolfi__search_packages --query=python
+
+Based on the search results, I found several Python-related packages in the Wolfi repository:
+- python3 (3.11.6)
+- python3-dev (3.11.6)
+- python3-doc (3.11.6)
+- ...
+
+User: What are the dependencies of python3?
+
+Claude: Let me check the dependencies for the python3 package.
+
+/tool mcp__wolfi__package_dependencies --package=python3
+
+The python3 package has the following dependencies:
+1. ca-certificates
+2. libcrypto3
+3. ...
+```
+
+### Managing the MCP Server
+
+- **List registered servers**: `claude mcp list`
+- **Get server details**: `claude mcp get wolfi`
+- **Remove the server**: `claude mcp remove wolfi`
+
+## Troubleshooting
+
+### Common Issues
+
+- **"Package not found" errors**: This could indicate that the package name is misspelled or the package is not available in the Wolfi repository.
+- **Connection errors when downloading**: Check your internet connection and firewall settings.
+- **Permission errors**: Ensure you have write permissions to the cache directory.
+
+### Debugging
+
+To see more information about what the server is doing:
+
+1. Run the MCP server directly:
+   ```bash
+   ./mcp-server
+   ```
+   This will show download progress and package loading information.
+
+2. Check the cache directories if you're experiencing issues:
+   - Linux: `~/.cache/wolfi-mcp/`
+   - macOS: `~/Library/Caches/wolfi-mcp/`
+   - Windows: `%LOCALAPPDATA%\wolfi-mcp\cache\`
 
 ## Development
 
