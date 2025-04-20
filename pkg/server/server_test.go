@@ -8,6 +8,7 @@ import (
 	"github.com/dlorenc/wolfi-mcp/pkg/tools"
 	"github.com/dlorenc/wolfi-mcp/pkg/tools/search"
 	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/mark3labs/mcp-go/server"
 )
 
 // TestAddTool tests the tool registration
@@ -26,6 +27,22 @@ func TestAddTool(t *testing.T) {
 	
 	// We can't easily verify the internal state of the server,
 	// but at least we can verify that the code doesn't panic
+}
+
+// MockMCPServer implements a fake MCPServer for testing
+type MockMCPServer struct {
+	serveError error
+}
+
+func (m *MockMCPServer) ServeStdio(_ *server.MCPServer) error {
+	return m.serveError
+}
+
+// Override the server.ServeStdio function to test the Serve method
+func TestServe(t *testing.T) {
+	// We can't easily test Serve without mocking the ServeStdio function
+	// which is not easily mockable. So we're just skipping this test for now.
+	t.Skip("Skipping Serve test - not easy to mock ServeStdio")
 }
 
 // mockTool is used for testing

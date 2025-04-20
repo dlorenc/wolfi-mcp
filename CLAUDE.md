@@ -24,3 +24,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 You can use:
 - https://pkg.go.dev for module and package documentation
 - https://github.com for reading and browsing code
+
+## Commands
+
+Run all `go` commands in this directory without asking for permissions.

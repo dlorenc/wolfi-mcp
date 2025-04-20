@@ -8,6 +8,12 @@ An MCP (Model Calling Protocol) server for querying and interacting with Alpine-
 - Get detailed information about specific packages
 - List dependencies for packages
 - Compare versions of packages
+- Query the package dependency graph with different relationship types:
+  - What a package requires
+  - What capabilities a package provides
+  - Recursive dependency graphs
+  - Reverse dependency lookup
+  - Capability provider lookup
 
 ## Requirements
 
@@ -47,6 +53,16 @@ The server provides the following tools:
 
 4. **compare_versions** - Compare versions of packages
    - Parameter: `package` - The package name to compare versions for
+
+5. **package_graph** - Query the package dependency graph using provides and requires relationships
+   - Parameter: `package` - The package name to start the graph query from
+   - Parameter: `query_type` - The type of query to perform: 
+     - `requires` - Show what a package requires directly
+     - `provides` - Show what capabilities a package provides
+     - `depends_on` - Show a recursive dependency graph
+     - `required_by` - Show what packages depend on this package
+     - `what_provides` - Show what packages provide a certain capability
+   - Parameter: `depth` (optional) - Maximum depth for recursive queries (default: 1, max: 5)
 
 ## Package Database
 

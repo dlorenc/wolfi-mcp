@@ -17,6 +17,9 @@ APKINDEX.tar.gz
 APKINDEX
 /tmp/
 
+# The binary itself
+wolfi-mcp
+
 # Go specific
 go.work
 go.work.sum

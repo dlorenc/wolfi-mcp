@@ -9,6 +9,7 @@ import (
 	"github.com/dlorenc/wolfi-mcp/pkg/server"
 	"github.com/dlorenc/wolfi-mcp/pkg/tools"
 	"github.com/dlorenc/wolfi-mcp/pkg/tools/dependencies"
+	"github.com/dlorenc/wolfi-mcp/pkg/tools/graph"
 	"github.com/dlorenc/wolfi-mcp/pkg/tools/info"
 	"github.com/dlorenc/wolfi-mcp/pkg/tools/search"
 	"github.com/dlorenc/wolfi-mcp/pkg/tools/versions"
@@ -44,6 +45,7 @@ func main() {
 		info.New(),
 		dependencies.New(),
 		versions.New(),
+		graph.New(),
 	}
 
 	// Register all tools with the server
