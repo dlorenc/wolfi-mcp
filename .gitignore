@@ -1,0 +1,26 @@
+# Binaries
+mcp-server
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Package index files
+APKINDEX.tar.gz
+APKINDEX
+/tmp/
+
+# Go specific
+go.work
+go.work.sum
+
+# OS specific
+.DS_Store
+Thumbs.db
