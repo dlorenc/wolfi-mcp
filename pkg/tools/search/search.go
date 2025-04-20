@@ -35,7 +35,7 @@ func (t *Tool) GetHandler(repo *apkindex.Repository) tools.ToolHandler {
 	return func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		query := strings.ToLower(request.Params.Arguments["query"].(string))
 		results := repo.Search(query)
-		
+
 		if len(results) == 0 {
 			return mcp.NewToolResultText("No packages found matching your query."), nil
 		}
@@ -43,7 +43,7 @@ func (t *Tool) GetHandler(repo *apkindex.Repository) tools.ToolHandler {
 		// Format the results as text
 		var sb strings.Builder
 		sb.WriteString(fmt.Sprintf("Found %d packages matching '%s':\n\n", len(results), query))
-		
+
 		for i, pkg := range results {
 			sb.WriteString(fmt.Sprintf("%d. %s (%s)\n", i+1, pkg.Name, pkg.Version))
 			if pkg.Description != "" {

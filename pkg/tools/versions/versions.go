@@ -36,7 +36,7 @@ func (t *Tool) GetHandler(repo *apkindex.Repository) tools.ToolHandler {
 	return func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		packageName := request.Params.Arguments["package"].(string)
 		versions := repo.GetPackageVersions(packageName)
-		
+
 		if len(versions) == 0 {
 			return mcp.NewToolResultText(fmt.Sprintf("No versions found for package '%s'.", packageName)), nil
 		}
@@ -51,7 +51,7 @@ func (t *Tool) GetHandler(repo *apkindex.Repository) tools.ToolHandler {
 		// Format the versions
 		var sb strings.Builder
 		sb.WriteString(fmt.Sprintf("Versions of %s:\n\n", packageName))
-		
+
 		for i, pkg := range versions {
 			sb.WriteString(fmt.Sprintf("%d. Version: %s\n", i+1, pkg.Version))
 			sb.WriteString(fmt.Sprintf("   Architecture: %s\n", pkg.Arch))

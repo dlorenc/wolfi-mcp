@@ -35,7 +35,7 @@ func newMockTool(name string) *mockTool {
 	tool := mcp.NewTool(name,
 		mcp.WithDescription("A mock tool for testing"),
 	)
-	
+
 	return &mockTool{
 		BaseTool: BaseTool{Tool: tool},
 		name:     name,
@@ -52,7 +52,7 @@ func TestBaseTool(t *testing.T) {
 	toolName := "test-tool"
 	mcpTool := mcp.NewTool(toolName)
 	baseTool := BaseTool{Tool: mcpTool}
-	
+
 	got := baseTool.GetTool()
 	if got.Name != toolName {
 		t.Errorf("GetTool().Name = %q, want %q", got.Name, toolName)
@@ -63,15 +63,15 @@ func TestRegisterAll(t *testing.T) {
 	// Create mock server and repository
 	srv := newMockServer()
 	repo := apkindex.NewRepository([]*apk.Package{})
-	
+
 	// Create mock tools
 	tool1 := newMockTool("tool1")
 	tool2 := newMockTool("tool2")
 	tool3 := newMockTool("tool3")
-	
+
 	// Register all tools
 	RegisterAll(srv, repo, tool1, tool2, tool3)
-	
+
 	// Verify all tools were registered
 	for _, name := range []string{"tool1", "tool2", "tool3"} {
 		if !srv.addedTools[name] {

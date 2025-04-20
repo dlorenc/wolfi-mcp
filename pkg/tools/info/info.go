@@ -35,7 +35,7 @@ func (t *Tool) GetHandler(repo *apkindex.Repository) tools.ToolHandler {
 	return func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		packageName := request.Params.Arguments["package"].(string)
 		pkg := repo.GetPackageInfo(packageName)
-		
+
 		if pkg == nil {
 			return mcp.NewToolResultText(fmt.Sprintf("Package '%s' not found.", packageName)), nil
 		}

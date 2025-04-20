@@ -44,7 +44,7 @@ func (t *Tool) GetHandler(repo *apkindex.Repository) tools.ToolHandler {
 	return func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		packageName := request.Params.Arguments["package"].(string)
 		queryType := request.Params.Arguments["query_type"].(string)
-		
+
 		// Parse depth parameter if provided
 		depth := 1
 		if depthStr, ok := request.Params.Arguments["depth"]; ok {
@@ -170,7 +170,7 @@ func getDependencyGraph(repo *apkindex.Repository, pkg *apk.Package, sb *strings
 		// Extract the package name from the dependency string
 		depParts := strings.Split(depStr, "=")
 		depName := depParts[0]
-		
+
 		// Skip special dependencies like "so:lib.so"
 		if strings.Contains(depName, ":") {
 			continue
@@ -181,10 +181,10 @@ func getDependencyGraph(repo *apkindex.Repository, pkg *apk.Package, sb *strings
 			sb.WriteString(fmt.Sprintf("%s├─ %s [already visited]\n", childPrefix, depName))
 			continue
 		}
-		
+
 		// Get the dependency package
 		depPkg := repo.GetPackageInfo(depName)
-		
+
 		// If found, recursively process it
 		if depPkg != nil {
 			getDependencyGraph(repo, depPkg, sb, childPrefix, currentDepth+1, maxDepth, visited)
@@ -203,30 +203,30 @@ func getDependencyGraph(repo *apkindex.Repository, pkg *apk.Package, sb *strings
 func findPackagesRequiring(repo *apkindex.Repository, packageName string) []string {
 	var requiringPackages []string
 	allPackages := repo.GetAllPackages()
-	
+
 	for _, pkg := range allPackages {
 		for _, dep := range pkg.Dependencies {
 			// Extract the package name from the dependency string (handle version constraints)
 			depParts := strings.Split(dep, "=")
 			depName := depParts[0]
-			
+
 			// Also handle other constraints like >= or >
 			if idx := strings.IndexAny(depName, "<>"); idx != -1 {
 				depName = strings.TrimSpace(depName[:idx])
 			}
-			
+
 			// Skip special dependencies like "so:lib.so"
 			if strings.Contains(depName, ":") {
 				continue
 			}
-			
+
 			if depName == packageName {
 				requiringPackages = append(requiringPackages, pkg.Name)
 				break
 			}
 		}
 	}
-	
+
 	return requiringPackages
 }
 
@@ -234,26 +234,26 @@ func findPackagesRequiring(repo *apkindex.Repository, packageName string) []stri
 func findPackagesProviding(repo *apkindex.Repository, capability string) []string {
 	var providingPackages []string
 	allPackages := repo.GetAllPackages()
-	
+
 	for _, pkg := range allPackages {
 		// Check if the package name itself matches the capability
 		if pkg.Name == capability {
 			providingPackages = append(providingPackages, pkg.Name)
 			continue
 		}
-		
+
 		// Check the provides list
 		for _, provide := range pkg.Provides {
 			// Extract the capability name (handle version constraints)
 			provideParts := strings.Split(provide, "=")
 			provideName := provideParts[0]
-			
+
 			if provideName == capability {
 				providingPackages = append(providingPackages, pkg.Name)
 				break
 			}
 		}
 	}
-	
+
 	return providingPackages
 }

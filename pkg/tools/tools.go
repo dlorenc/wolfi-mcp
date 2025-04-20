@@ -14,7 +14,7 @@ type ToolHandler func(context.Context, mcp.CallToolRequest) (*mcp.CallToolResult
 type Tool interface {
 	// GetTool returns the MCP tool definition
 	GetTool() mcp.Tool
-	
+
 	// GetHandler returns the handler function for the tool
 	GetHandler(repo *apkindex.Repository) ToolHandler
 }

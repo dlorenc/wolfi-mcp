@@ -14,35 +14,35 @@ import (
 func TestGraphTool(t *testing.T) {
 	// Create tool
 	tool := New()
-	
+
 	// Check tool name
 	if tool.GetTool().Name != "package_graph" {
 		t.Errorf("Expected tool name to be 'package_graph', got '%s'", tool.GetTool().Name)
 	}
-	
+
 	// Create mock repository with dependency relationships
 	mockPackages := []*apk.Package{
 		{
-			Name: "base-package", 
-			Version: "1.0.0", 
+			Name:         "base-package",
+			Version:      "1.0.0",
 			Dependencies: []string{"lib-package=2.0.0"},
 		},
 		{
-			Name: "lib-package", 
-			Version: "2.0.0",
+			Name:     "lib-package",
+			Version:  "2.0.0",
 			Provides: []string{"lib-capability=2.0"},
 		},
 		{
-			Name: "app-package", 
-			Version: "3.0.0",
+			Name:         "app-package",
+			Version:      "3.0.0",
 			Dependencies: []string{"lib-package>=1.5.0", "base-package"},
 		},
 	}
 	repo := apkindex.NewRepository(mockPackages)
-	
+
 	// Get handler
 	handler := tool.GetHandler(repo)
-	
+
 	// Test the findPackagesProviding function directly
 	t.Run("findPackagesProviding", func(t *testing.T) {
 		// Find packages providing a capability that exists
@@ -50,20 +50,20 @@ func TestGraphTool(t *testing.T) {
 		if len(providers) != 1 || providers[0] != "lib-package" {
 			t.Errorf("Expected [lib-package], got %v", providers)
 		}
-		
+
 		// Find packages providing a capability that doesn't exist
 		providers = findPackagesProviding(repo, "nonexistent-capability")
 		if len(providers) != 0 {
 			t.Errorf("Expected empty slice, got %v", providers)
 		}
-		
+
 		// Find packages by name match (implicit provides)
 		providers = findPackagesProviding(repo, "lib-package")
 		if len(providers) != 1 || providers[0] != "lib-package" {
 			t.Errorf("Expected [lib-package], got %v", providers)
 		}
 	})
-	
+
 	// Test different query types
 	testCases := []struct {
 		name              string
@@ -134,13 +134,13 @@ func TestGraphTool(t *testing.T) {
 		},
 		{
 			name:              "what_provides with package that doesn't exist",
-			pkg:               "nonexistent-capability", 
+			pkg:               "nonexistent-capability",
 			queryType:         "what_provides",
 			checkText:         "No packages found that provide",
 			expectedErrorFlag: false,
 		},
 	}
-	
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			req := mcp.CallToolRequest{}
@@ -149,40 +149,40 @@ func TestGraphTool(t *testing.T) {
 				"package":    tc.pkg,
 				"query_type": tc.queryType,
 			}
-			
+
 			// Add depth parameter if specified
 			if tc.depth != "" {
 				args["depth"] = tc.depth
 			}
-			
+
 			req.Params.Arguments = args
-			
+
 			result, err := handler(context.Background(), req)
 			if err != nil {
 				t.Fatalf("Handler returned error: %v", err)
 			}
-			
+
 			// Verify error flag is as expected
 			if result.IsError != tc.expectedErrorFlag {
 				t.Fatalf("Expected IsError=%v, got %v", tc.expectedErrorFlag, result.IsError)
 			}
-			
+
 			// Skip further checks for error responses
 			if result.IsError {
 				return
 			}
-			
+
 			// Verify we have content
 			if len(result.Content) == 0 {
 				t.Errorf("Expected non-empty result content")
 			}
-			
+
 			// Convert to JSON to check for expected text
 			jsonData, err := json.Marshal(result)
 			if err != nil {
 				t.Fatalf("Failed to marshal result: %v", err)
 			}
-			
+
 			jsonStr := string(jsonData)
 			if !strings.Contains(jsonStr, tc.checkText) {
 				t.Errorf("Expected result to contain '%s', got: %s", tc.checkText, jsonStr)

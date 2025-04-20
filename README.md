@@ -40,6 +40,15 @@ The server reads from standard input and writes to standard output following the
 
 # Use a specific APKINDEX file
 ./mcp-server -index /path/to/your/APKINDEX.tar.gz
+
+# Use an APKINDEX from a URL (will be downloaded and cached)
+./mcp-server -index https://packages.wolfi.dev/os/x86_64/APKINDEX.tar.gz
+
+# Use multiple APKINDEX files (will be merged following Alpine merging semantics)
+./mcp-server -index /path/to/first/APKINDEX.tar.gz -index /path/to/second/APKINDEX.tar.gz
+
+# Use a mix of local files and URLs
+./mcp-server -index /path/to/local/APKINDEX.tar.gz -index https://example.com/repo/APKINDEX.tar.gz
 ```
 
 ### Available Tools
@@ -85,6 +94,32 @@ The downloaded file is cached in a standard OS-specific location to avoid unnece
 
 You can override this behavior and use a specific APKINDEX file by using the `-index` flag.
 
+### Multiple APKINDEX Support
+
+The server supports loading multiple APKINDEX files by using the `-index` flag multiple times:
+
+```bash
+./mcp-server -index first.tar.gz -index second.tar.gz -index third.tar.gz
+```
+
+The `-index` flag can accept:
+- Local file paths: `-index /path/to/APKINDEX.tar.gz`
+- URLs: `-index https://packages.wolfi.dev/os/x86_64/APKINDEX.tar.gz`
+- A mix of both: `-index local.tar.gz -index https://example.com/APKINDEX.tar.gz`
+
+When a URL is provided, the server will:
+1. Download the APKINDEX file from the specified URL
+2. Cache it locally in the standard cache directory (using a filename based on the URL hash)
+3. Use the cached file for subsequent runs (unless the cache is cleared)
+
+When multiple APKINDEX files are provided, they are merged following Alpine Linux package repository semantics:
+
+1. If a package appears in multiple index files:
+   - The highest version wins
+   - For identical versions, the most recently indexed one (rightmost in command line arguments) takes precedence
+
+This allows combining packages from different repositories or overlaying custom packages on top of the base distribution.
+
 ## Using with Claude Code
 
 This MCP server is designed to work with Claude Code via the Model Context Protocol (MCP). Here's how to set it up:
@@ -116,6 +151,18 @@ This MCP server is designed to work with Claude Code via the Model Context Proto
    
    ```bash
    claude mcp add wolfi -- ./mcp-server -index /path/to/your/APKINDEX.tar.gz
+   ```
+   
+   With a URL:
+   
+   ```bash
+   claude mcp add wolfi -- ./mcp-server -index https://packages.wolfi.dev/os/x86_64/APKINDEX.tar.gz
+   ```
+   
+   Or with multiple APKINDEX files (mix of local files and URLs):
+   
+   ```bash
+   claude mcp add wolfi -- ./mcp-server -index /path/to/first/APKINDEX.tar.gz -index https://example.com/custom/APKINDEX.tar.gz
    ```
    
    To make the server available in all projects:
